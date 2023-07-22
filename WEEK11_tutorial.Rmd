@@ -1,0 +1,377 @@
+---
+title: "Week 11 Tutorial"
+output: html_notebook
+Author: Faria Hossain and Asim Gul
+---
+
+## Correlation and Linear Regression
+
+The following commands will install these packages if they are not already installed:
+
+
+```{r}
+if(!require(psych)){install.packages("psych")}
+if(!require(PerformanceAnalytics)){install.packages("PerformanceAnalytics")}
+if(!require(ggplot2)){install.packages("ggplot2")}
+if(!require(rcompanion)){install.packages("rcompanion")}
+```
+
+```{r}
+Input = ("
+Instructor       Grade   Weight  Calories Sodium  Score
+'Brendon Small'     6      43     2069    1287      77
+'Brendon Small'     6      41     1990    1164      76
+'Brendon Small'     6      40     1975    1177      76
+'Brendon Small'     6      44     2116    1262      84
+'Brendon Small'     6      45     2161    1271      86
+'Brendon Small'     6      44     2091    1222      87
+'Brendon Small'     6      48     2236    1377      90
+'Brendon Small'     6      47     2198    1288      78
+'Brendon Small'     6      46     2190    1284      89
+'Jason Penopolis'   7      45     2134    1262      76
+'Jason Penopolis'   7      45     2128    1281      80
+'Jason Penopolis'   7      46     2190    1305      84
+'Jason Penopolis'   7      43     2070    1199      68
+'Jason Penopolis'   7      48     2266    1368      85
+'Jason Penopolis'   7      47     2216    1340      76
+'Jason Penopolis'   7      47     2203    1273      69
+'Jason Penopolis'   7      43     2040    1277      86
+'Jason Penopolis'   7      48     2248    1329      81
+'Melissa Robins'    8      48     2265    1361      67
+'Melissa Robins'    8      46     2184    1268      68
+'Melissa Robins'    8      53     2441    1380      66
+'Melissa Robins'    8      48     2234    1386      65
+'Melissa Robins'    8      52     2403    1408      70
+'Melissa Robins'    8      53     2438    1380      83
+'Melissa Robins'    8      52     2360    1378      74
+'Melissa Robins'    8      51     2344    1413      65
+'Melissa Robins'    8      51     2351    1400      68
+'Paula Small'       9      52     2390    1412      78
+'Paula Small'       9      54     2470    1422      62
+'Paula Small'       9      49     2280    1382      61
+'Paula Small'       9      50     2308    1410      72
+'Paula Small'       9      55     2505    1410      80
+'Paula Small'       9      52     2409    1382      60
+'Paula Small'       9      53     2431    1422      70
+'Paula Small'       9      56     2523    1388      79
+'Paula Small'       9      50     2315    1404      71
+'Coach McGuirk'    10      52     2406    1420      68
+'Coach McGuirk'    10      58     2699    1405      65
+'Coach McGuirk'    10      57     2571    1400      64
+'Coach McGuirk'    10      52     2394    1420      69
+'Coach McGuirk'    10      55     2518    1379      70
+'Coach McGuirk'    10      52     2379    1393      61
+'Coach McGuirk'    10      59     2636    1417      70
+'Coach McGuirk'    10      54     2465    1414      59
+'Coach McGuirk'    10      54     2479    1383      61
+")
+Data = read.table(textConnection(Input),header=TRUE)
+```
+
+
+```{r}
+###  Order factors by the order in data frame
+###  Otherwise, R will alphabetize them
+Data$Instructor = factor(Data$Instructor,
+                         levels=unique(Data$Instructor))
+###  Check the data frame
+```
+
+
+```{r}
+library(psych)
+headTail(Data)
+```
+
+
+```{r}
+str(Data)
+```
+
+
+```{r}
+summary(Data)
+```
+
+
+
+Visualizing correlated variables
+ 
+
+Correlation does not have independent and dependent variables
+Notice in the formulae for the pairs and cor.test functions, that all variables are named to the right of the ~.  One reason for this is that correlation is measured between two variables without assuming that one variable is the dependent variable and one is the independent variable.  By necessity, one variable must be plotted on the x-axis and one on the y-axis, but their placement is arbitrary.
+
+ 
+
+Multiple correlation
+The pairs function can plot multiple numeric or integer variables on a single plot to look for correlations among the variables.
+
+```{r}
+pairs(data=Data,~ Grade + Weight + Calories + Sodium + Score)
+```
+
+The corr.test function in the psych package can be used in a similar manner, with the output being a table of correlation coefficients and a table of p-values.  p-values can be adjusted with the adjust= option.  Options for correlation methods are “pearson”, “kendall”, and “spearman”.  The function can produce confidence intervals for the correlation coefficients, but I recommend using the cor.ci function in the psych package for this task (not shown here).
+
+ 
+
+The corr.test function requires that the data frame contain only numeric or integer variables, so we will first create a new data frame called Data.num containing only the numeric and integer variables.
+
+```{r}
+Data.num = Data[c("Grade", "Weight", "Calories", "Sodium", "Score")]
+library(psych)
+corr.test(Data.num,use    = "pairwise",method = "pearson",adjust = "none")
+```
+
+A useful plot of histograms, correlations, and correlation coefficients can be produced with the chart.Correlation function in the PerformanceAnalytics package.
+
+ 
+The function requires that the data frame contain only numeric or integer variables, so we will first create a new data frame called Data.num containing only the numeric and integer variables.
+
+```{r}
+Data.num = Data[c("Grade", "Weight", "Calories", "Sodium", "Score")]
+library(PerformanceAnalytics)
+chart.Correlation(Data.num,
+                   method="pearson",
+                   histogram=TRUE,
+                   pch=16)
+```
+
+r-squared
+For linear regression, r-squared is used as an effect size statistic.  It indicates the proportion of the variability in the dependent variable that is explained by model.  That is, an r-squared of 0.60 indicates that 60% of the variability in the dependent variable is explained by the model.
+
+Pearson correlation
+The test used for Pearson correlation is a parametric analysis that requires that the relationship between the variables is linear, and that the data be bivariate normal.  Variables should be interval/ratio.  The test is sensitive to outliers.
+
+The correlation coefficient, r, can range from +1 to –1, with +1 being a perfect positive correlation and –1 being a perfect negative correlation.  An r of 0 represents no correlation whatsoever.  The hypothesis test determines if the r value is significantly different from 0.
+
+ 
+
+As an example, we’ll plot Sodium vs. Calories, and use the cor.test function to test the correlation of these two variables.
+
+Simple plot of the data
+Note that the relationship between the y and x variables is not particularly linear.
+
+```{r}
+plot(Sodium ~ Calories,data=Data,pch=16,xlab = "Calories",ylab = "Sodium")
+```
+
+Pearson correlation
+Note that the results report the p-value for the hypothesis test as well as the r value, written as cor, 0.849.
+
+```{r}
+cor.test( ~ Sodium + Calories,data=Data,method = "pearson")
+```
+
+
+Plot residuals
+It’s not a bad idea to look at the residuals from Pearson correlation to be sure the data meet the assumption of bivariate normality.  Unfortunately, the cor.test function doesn’t supply residuals.  One solution is to use the lm function, which actually redoes the analysis as a linear regression.
+
+```{r}
+model = lm(Sodium ~ Calories,data = Data)
+x = residuals(model)
+library(rcompanion)
+plotNormalHistogram(x)
+```
+
+image
+
+Kendall correlation
+Kendall correlation is considered a nonparametric analysis.  It is a rank-based test that does not require assumptions about the distribution of the data.  Variables can be interval/ratio or ordinal.
+
+
+The correlation coefficient from the test is tau, which can range from +1 to –1, with +1 being a perfect positive correlation and –1 being a perfect negative correlation.  A tau of 0 represents no correlation whatsoever.  The hypothesis test determines if the tau value is significantly different from 0.
+
+As a technical note, the cor.test function in R calculates tau-b, which handles ties in ranks well.
+
+
+The test is relatively robust to outliers in the data.  The test is sometimes cited for being reliable when there are small number of samples or when there are many ties in ranks.
+
+Kendall correlation
+Note that the results report the p-value for the hypothesis test as well as the tau value, written as tau, 0.649.
+
+```{r}
+cor.test( ~ Sodium + Calories,data=Data,method = "kendall")
+```
+
+Spearman correlation
+Spearman correlation is considered a nonparametric analysis.  It is a rank-based test that does not require assumptions about the distribution of the data.  Variables can be interval/ratio or ordinal.
+
+The correlation coefficient from the test, rho, can range from +1 to –1, with +1 being a perfect positive correlation and –1 being a perfect negative correlation.  A rho of 0 represents no correlation whatsoever. The hypothesis test determines if the rho value is significantly different from 0.
+
+
+Spearman correlation is probably most often used with ordinal data.  It tests for a monotonic relationship between the variables.  It is relatively robust to outliers in the data. 
+
+ 
+Spearman correlation
+Note that the results report the p-value for the hypothesis test as well as the rho value, written as rho, 0.820.
+
+
+```{r}
+cor.test( ~ Sodium + Calories,data=Data,method = "spearman")
+```
+
+Linear regression
+Linear regression is a very common approach to model the relationship between two interval/ratio variables.  The method assumes that there is a linear relationship between the dependent variable and the independent variable, and finds a best fit model for this relationship.
+
+ 
+
+Dependent and Independent variables
+When plotted, the dependent variable is usually placed on the y-axis, and the independent variable is usually placed in the x-axis.
+
+ 
+
+Interpretation of coefficients
+The outcome of linear regression includes estimating the intercept and the slope of the linear model.  Linear regression can then be used as a predictive model, whereby the model can be used to predict a y value for any given x.  In practice, the model shouldn’t be used to predict values beyond the range of the x values used to develop the model.
+
+ 
+
+Multiple, nominal, and ordinal independent variables
+If there are multiple independent variables of interval/ratio type in the model, then linear regression expands to multiple regression.  The polynomial regression example in this chapter is a form of multiple regression.
+
+
+If the independent variable were of nominal type, then the linear regression would become a one-way analysis of variance.
+
+
+Handling independent variables of ordinal type can be complicated.  Often they are treated as either nominal type or interval/ratio type, although there are drawbacks to each approach.
+
+Assumptions
+Linear regression assumes a linear relationship between the two variables, normality of the residuals, independence of the residuals, and homoscedasticity of residuals.
+
+Note on writing r-squared
+For bivariate linear regression, the r-squared value often uses a lower case r; however, some authors prefer to use a capital R.  For multiple regression, the R in the R-squared value is usually capitalized.  The name of the statistic may be written out as “r-squared” for convenience, or as r2.
+
+
+Define model, and produce model coefficients, p-value, and r-squared value
+Linear regression can be performed with the lm function, which was the same function we used for analysis of variance.
+
+The summary function for lm model objects includes estimates for model parameters (intercept and slope), as well as an r-squared value for the model and p-value for the model. 
+
+Note that even for bivariate regression, the output calls the r-squared value “Multiple R-squared”.
+
+```{r}
+model = lm(Sodium ~ Calories,data = Data)
+summary(model)
+```
+
+Plot data with best fit line
+```{r}
+plot(Sodium ~ Calories,data=Data,pch=16,xlab = "Calories",ylab = "Sodium")
+abline(model,col = "blue",lwd = 2)
+```
+
+There is a clear nonlinearity to the data, suggesting that the simple linear model is not the best fit.  This nonlinearity is apparent in the plot of residuals vs. fitted values as well.
+
+The next chapter will include fitting linear plateau, quadratic plateau, and a curvilinear models with this data.
+
+The following section will attempt to improve the model fit by adding polynomial terms.
+
+Plots of residuals
+
+```{r}
+x = residuals(model)
+library(rcompanion)
+plotNormalHistogram(x)
+```
+
+```{r}
+plot(fitted(model),
+     residuals(model))
+```
+
+Polynomial regression
+Polynomial regression adds additional terms to the model, so that the terms include some set of the linear, quadratic, cubic, and quartic, etc., forms of the independent variable.  These terms are the independent variable, the square of the independent variable, the cube of the independent variable, and so on.
+
+ 
+
+Create polynomial terms in the data frame
+Because the variable Calories is an integer variable, we will need to convert it to a numeric variable.  Otherwise R will produce errors when we try to square and cube the values of the variable.
+
+ 
+
+Our new variables will be Calories2 for the square of Calories, Calories3 for the cube of Calories, and so on.
+
+```{r}
+Data$Calories = as.numeric(Data$Calories)
+Data$Calories2 = Data$Calories * Data$Calories
+Data$Calories3 = Data$Calories * Data$Calories * Data$Calories
+Data$Calories4 = Data$Calories * Data$Calories * Data$Calories * Data$Calories
+```
+
+
+Define models and determine best model
+Chances are that we will not need all of the polynomial terms to adequately model our data.  One approach to choosing the best model is to construct several models with increasing numbers of polynomial terms, and then use a model selection criterion like AIC, AICc, or BIC to choose the best one.  These criteria balance the goodness-of-fit of each model versus its complexity.  That is, the goal is to find a model which adequately explains the data without having too many terms.
+
+
+We can use the compareLM function to list AIC, AICc, and BIC for a series of models.
+
+```{r}
+model.1 = lm(Sodium ~ Calories,data = Data)
+model.2 = lm(Sodium ~ Calories + Calories2,data = Data)
+model.3 = lm(Sodium ~ Calories + Calories2 + Calories3,data = Data)
+model.4 = lm(Sodium ~ Calories + Calories2 + Calories3 + Calories4,data = Data)
+library(rcompanion)
+compareLM(model.1, model.2, model.3, model.4)
+```
+
+
+If we use BIC as our model fit criterion, we would choose model.2 as the best model for these data, since it had the lowest BIC.  AIC or AICc could have been used as criteria instead.
+
+
+BIC tends to penalize models more than the other criteria for having additional parameters, so it will tend to choose models with fewer terms.
+
+
+There is not generally accepted advice as to which model fitting criterion to use.  My advice might be to use BIC when a more parsimonious model (one with fewer terms) is a priority, and in other cases use AICc.
+
+ 
+
+For final model, produce model coefficients, p-value, and R-squared value
+```{r}
+summary(model.2)
+```
+
+Note on retaining lower-order effects
+In polynomial regression, we typically keep all lower order effects of any higher order effects we include.  So, in this case, if the final model included Calories2, but the effect of Calories were not significant, we would still include Calories in the model since we are including Calories2.
+
+ 
+
+Plot data with best fit line
+For bivariate data, the function plotPredy will plot the data and the predicted line for the model.  It also works for polynomial functions, if the order option is changed.
+
+```{r}
+library(rcompanion)
+plotPredy(data  = Data,
+           y     = Sodium,
+           x     = Calories,
+           x2    = Calories2,
+           model = model.2,
+           order = 2,
+           xlab  = "Calories per day",
+           ylab  = "Sodium intake per day")
+```
+
+
+
+Plot of best fit line with confidence interval
+For polynomial regression, the ggplot function can plot the best-fit curve with the confidence interval of the curve shaded.
+
+```{r}
+library(ggplot2)
+ggplot(Data,aes(x = Calories,y = Sodium)) +
+  geom_point() +
+  geom_smooth(method  = "lm",
+  formula = y ~ poly(x, 2, raw=TRUE), ### polynomial of order 2
+se= TRUE)
+```
+
+Plots of residuals
+
+```{r}
+x = residuals(model.2)
+library(rcompanion)
+plotNormalHistogram(x)
+```
+
+```{r}
+plot(fitted(model.2),
+     residuals(model.2))
+```

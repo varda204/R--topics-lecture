@@ -1,0 +1,197 @@
+---
+title: "Week 10"
+output: html_notebook
+---
+
+
+## Confidence Intervals
+
+##EXAMPLE 1
+
+```{r}
+exam1 <- c(1.958,1.951,2.107,2.092,1.955,2.162,2.168,2.134,1.971,2.072,2.049,2.017,2.117,1.977,2.034,2.062,2.110,1.974,1.992,2.018,2.135,2.107,2.084,2.169,2.085,2.018,1.977,2.116,1.988,2.066,2.126,2.167,1.969,2.198,2.078,2.119,2.088,2.172,2.133,2.112,2.066,2.128,2.142,2.042,2.050,2.102,2.000,2.188,1.960,2.128)
+mean(exam1)
+length(exam1)
+sqrt(var(exam1))
+```
+```{r}
+t.test(exam1, mu=mean(exam1), alternative = 'two.sided',conf.level = 0.95)
+```
+
+
+## Student's T-Test
+Performs one and two sample t-tests on vectors of data.
+t.test(x, y = NULL,
+       alternative = c("two.sided", "less", "greater"),
+       mu = 0, paired = FALSE, var.equal = FALSE,
+       conf.level = 0.95, ...)
+
+```{r}
+cheese <- c(21.5, 18.95, 18.55, 19.4, 19.15,
+            22.35, 22.9, 22.2, 23.1)
+t.test(cheese, mu = mean(cheese), alternative = 'two.sided')
+```
+
+
+## Bernoulli likelihood
+
+```{r}
+likelihood.Bernoulli = function(theta, x) 
+
+{                                                                
+# theta success probability parameter
+# x vector of data
+n = length(x)
+L_ans = theta^sum(x)*(1-theta)^(n-sum(x))
+return(L_ans)
+}
+# plot Bernoulli likelihood
+x = c(0,0,0,0,0)
+theta.vals = seq(0,1, length.out=10)
+## length.out	-- desired length of the sequence. A non-negative number, which for seq and seq.int will be rounded up if fractional
+
+print(x)
+print(theta.vals)
+like.vals = likelihood.Bernoulli(theta.vals, x)
+plot(theta.vals, like.vals, type="b", col="blue", lwd=2, main="Bernoulli Likelihood for x=(0,0,0,0,0)")
+```
+
+
+##   Normal Likelihood
+
+
+```{r}
+likelihood.normal.mu = function(mu, sig2=1, x) {
+# mu mean of normal distribution for given sig2
+# x vector of data
+n = length(x)
+a1 = (2*pi*sig2)^-(n/2)
+a2 = -1/(2*sig2)
+y = (x-mu) ^2
+ans = a1*exp(a2*sum(y))
+return(ans)
+}
+# generate N(0,1) data
+n = 50
+x = rnorm(n, mean=0, sd=1)
+
+# compute normal likelihood as function of mu
+mu.vals = seq(-1,1, length.out=100)
+like.vals = rep(0,length(mu.vals))
+for (i in 1:length(like.vals)) {
+like.vals[i] = likelihood.normal.mu(mu.vals[i], sig2=1, x=x)
+}
+plot(mu.vals, like.vals, type="b", col="blue", lwd=2, main="Normal Likelihood for x=rnorm(n, mean=0, sd=1)")
+```
+
+
+## Hypothese Test
+
+
+```{r}
+set.seed(1234)
+my_data <- data.frame(
+  name = paste0(rep("M_", 10), 1:10),
+  weight = round(rnorm(10, 20, 2), 1)
+)
+```
+
+step1： Check your data
+# Print the first 10 rows of the data
+```{r}
+head(my_data, 10)
+```
+```{r}
+# Statistical summaries of weight
+summary(my_data$weight)
+```
+
+Min.: the minimum value
+1st Qu.: The first quartile. 25% of values are lower than this.
+Median: the median value. Half the values are lower; half are higher.
+3rd Qu.: the third quartile. 75% of values are higher than this.
+Max.: the maximum value
+
+Step 2: Visualize your data using box plots
+
+```{r}
+boxplot(my_data$weight, 
+          ylab = "Weight (g)", xlab = FALSE)
+```
+
+
+Step 3: Preleminary test to check one-sample t-test assumptions
+
+1. Is this a large sample? - No, because n < 30.
+2. Since the sample size is not large enough (less than 30, central limit theorem), we need to check whether the data follow a normal distribution.
+
+
+Briefly, it’s possible to use the Shapiro-Wilk normality test and to look at the normality plot.
+
+Shapiro-Wilk test:
+Null hypothesis: the data are normally distributed
+Alternative hypothesis: the data are not normally distributed
+
+ 
+
+```{r}
+shapiro.test(my_data$weight) # => p-value = 0.6993
+```
+ 
+
+From the output, the p-value is greater than the significance level 0.05 implying that the distribution of the data are not significantly different from normal distribtion. In other words, we can assume the normality.
+
+
+Visual inspection of the data normality using Q-Q plots (quantile-quantile plots). Q-Q plot draws the correlation between a given sample and the normal distribution.
+
+```{r}
+library("ggpubr")
+ggqqplot(my_data$weight, ylab = "Men's weight",
+         ggtheme = theme_minimal())
+```
+
+From the normality plots, we conclude that the data may come from normal distributions.
+
+Note that, if the data are not normally distributed, it’s recommended to use the non parametric one-sample Wilcoxon rank test.
+
+Compute one-sample t-test
+We want to know, if the average weight of the mice differs from 25g (two-tailed test)?
+```{r}
+(a = mean(my_data$weight))
+```
+
+
+```{r}
+# One-sample t-test
+res <- t.test(my_data$weight, mu =25, alternative = "two.sided")
+# Printing the results
+res 
+```
+ 
+
+In the result above :
+
+--t is the t-test statistic value (t = -9.078),
+--df is the degrees of freedom (df= 10-1 = 9),
+--p-value is the significance level of the t-test (p-value = 7.95310^{-6}).
+--conf.int is the confidence interval of the mean at 95% (conf.int = [17.8172, 20.6828]);
+--sample estimates is he mean value of the sample (mean = 19.25).
+
+Note that:
+
+if you want to test whether the mean weight of mice is less than 25g (one-tailed test), type this:
+
+```{r}
+t.test(my_data$weight, mu = 25,
+              alternative = "less")
+```
+Or, if you want to test whether the mean weight of mice is greater than 25g (one-tailed test), type this:
+```{r}
+t.test(my_data$weight, mu = 25,
+              alternative = "greater")
+```
+
+
+
+
+

@@ -1,0 +1,376 @@
+---
+title: "Handling missing values and recoding"
+output: html_document
+Author：Faria Hossain and Asim Gul
+---
+
+
+# Dealing with Missing Values
+
+A common task in data analysis is dealing with missing values. In R, missing values are often represented by NA or some other value that represents missing values (i.e. 99). We can easily work with missing values and in this section you will learn how to:
+
+### Very basics
+Missing data in R appears as NA. NA is not a string or a numeric value, but an indicator of missingness. We can create vectors with missing values.
+```{r}
+x1 <- c(1, 4, 3, NA, 7)
+x2 <- c("a", "B", NA, "NA")
+```
+NA is the one of the few non-numbers that we could include in x1 without generating an error (and the other exceptions are letters representing numbers or numeric ideas like infinity). In x2, the third value is missing while the fourth value is the character string “NA”. To see which values in each of these vectors R recognizes as missing, we can use the is.na function. It will return a TRUE/FALSE vector with as any elements as the vector we provide.
+
+```{r}
+is.na(x1)
+is.na(x2)
+```
+We can see that R distinguishes between the NA and “NA” in x2–NA is seen as a missing value, “NA” is not.
+
+## Differences from other packages
+NA cannot be used in comparisons: In other packages, a “missing” value is assigned an extreme numeric value–either very high or very low. As a result, values coded as missing can 1) be compared to other values and 2) other values can be compared to missing. In the example SAS code below, we compare the values in y to 0 and to the missing symbol and see that both comparisons are valid (and that the missing symbol is valued at less than zero).
+
+```{r}
+x1 < 0
+```
+
+```{r}
+x1 == NA
+```
+Our missing value cannot be compared to 0 and none of our values can be compared to NA because NA is not assigned a value–it simply is or it isn’t.
+
+NA is used for all kinds of missing data: In other packages, missing strings and missing numbers might be represented differently–empty quotations for strings, periods for numbers. In R, NA represents all types of missing data. We saw a small example of this in x1 and x2. x1 is a “numeric” object and x2 is a “character” object.
+Non-NA values cannot be interpreted as missing: Other packages allow you to designate values as “system missing” so that these values will be interpreted in the analysis as missing. In R, you would need to explicitly change these values to NA. The is.na function can also be used to make such a change:
+```{r}
+is.na(x1) <- which(x1 == 7)
+x1
+```
+
+```{r}
+mean(x1)
+```
+
+If you wish to calculate the mean of the non-missing values in the passed object, you can indicate this in the na.rm argument (which is, by default, set to FALSE).
+```{r}
+mean(x1, na.rm = TRUE)
+```
+Two common commands used in data management and exploration are summary and table. The summary command (when used with numeric vectors) returns the number of NAs in a vector, but the table command ignores NAs by default.
+```{r}
+summary(x1)
+```
+```{r}
+table(x1)
+```
+
+To see NA among the table output, you can indicate “ifany” or “always” in the useNA argument. The first will show NA in the output only if there is some missing data in the object. The second will include NA in the output regardless.
+```{r}
+table(x1, useNA = "ifany")
+```
+```{r}
+table(1:3, useNA = "always")
+```
+
+
+Sorting data containing missing values in R is again different from other packages because NA cannot be compared to other values. By default, sort removes any NA values and can therefore change the length of a vector.
+```{r}
+(x1s <- sort(x1))
+```
+
+```{r}
+length(x1s)
+```
+
+The user can specify if NA should be last or first in a sorted order by indicating TRUE or FALSE for the na.last argument.
+```{r}
+sort(x1, na.last = TRUE)
+```
+
+
+## NA options in R
+We have introduced is.na as a tool for both finding and creating missing values. It is one of several functions built around NA. Most of the other functions for NA are options for na.action.
+
+Just as there are default settings for functions, there are similar underlying defaults for R as a software. You can view these current settings with options(). One of these is the “na.action” that describes how missing values should be treated. The possible na.action settings within R include:
+
+na.omit and na.exclude: returns the object with observations removed if they contain any missing values; differences between omitting and excluding NAs can be seen in some prediction and residual functions
+na.pass: returns the object unchanged
+na.fail: returns the object only if it contains no missing values
+To see the na.action currently in in options, use getOption(“na.action”). We can create a data frame with missing values and see how it is treated with each of the above.
+```{r}
+(g <- as.data.frame(matrix(c(1:5, NA), ncol = 2)))
+```
+
+```{r}
+na.omit(g)
+```
+
+```{r}
+na.exclude(g)
+```
+```{r}
+na.fail(g)
+```
+
+```{r}
+na.pass(g)
+```
+
+
+## Test for missing values
+To identify missing values use is.na() which returns a logical vector with TRUE in the element locations that contain missing values represented by NA. is.na() will work on vectors, lists, matrices, and data frames.
+
+```{r}
+# vector with missing data
+x <- c(1:4, NA, 6:7, NA)
+x
+```
+
+```{r}
+is.na(x)
+```
+
+```{r}
+# data frame with missing data
+df <- data.frame(col1 = c(1:3, NA),
+                 col2 = c("this", NA,"is", "text"), 
+                 col3 = c(TRUE, FALSE, TRUE, TRUE), 
+                 col4 = c(2.5, 4.2, 3.2, NA),
+                 stringsAsFactors = FALSE)
+# identify NAs in full data frame
+is.na(df)
+```
+
+```{r}
+# identify NAs in specific data frame column
+is.na(df$col4)
+```
+
+To identify the location or the number of NAs we can leverage the which() and sum() functions:
+```{r}
+# identify location of NAs in vector
+which(is.na(df))
+```
+
+```{r}
+# identify count of NAs in data frame
+sum(is.na(df))
+```
+
+For data frames, a convenient shortcut to compute the total missing values in each column is to use colSums():
+
+```{r}
+colSums(is.na(df))
+```
+Recode missing values
+To recode missing values; or recode specific indicators that represent missing values, we can use normal subsetting and assignment operations. For example, we can recode missing values in vector x with the mean values in x by first subsetting the vector to identify NAs and then assign these elements a value. Similarly, if missing values are represented by another value (i.e. 99) we can simply subset the data for the elements that contain that value and then assign a desired value to those elements.
+
+## recode missing values with the mean
+
+vector with missing data
+```{r}
+x <- c(1:4, NA, 6:7, NA)
+print(x)
+```
+
+
+```{r}
+x[is.na(x)] <- mean(x, na.rm = TRUE)
+```
+
+```{r}
+round(x, 2)
+```
+
+```{r}
+# data frame that codes missing values as 99
+df <- data.frame(col1 = c(1:3, 99), col2 = c(2.5, 4.2, 99, 3.2))
+df
+```
+
+```{r}
+# change 99s to NAs
+df[df == 99] <- NA
+df
+```
+
+If we want to recode missing values in a single data frame variable we can subset for the missing value in that specific variable of interest and then assign it the replacement value. For example, here we recode the missing value in col4 with the mean value of col4.
+
+# data frame with missing data
+```{r}
+df <- data.frame(col1 = c(1:3, NA),
+                 col2 = c("this", NA,"is", "text"), 
+                 col3 = c(TRUE, FALSE, TRUE, TRUE), 
+                 col4 = c(2.5, 4.2, 3.2, NA),
+                 stringsAsFactors = FALSE)
+                 
+df$col4[is.na(df$col4)] <- mean(df$col4, na.rm = TRUE)
+df
+```
+
+### Exclude missing values
+We can exclude missing values in a couple different ways. First, if we want to exclude missing values from mathematical operations use the na.rm = TRUE argument. If you do not exclude these values most functions will return an NA.
+
+```{r}
+# A vector with missing values
+x <- c(1:4, NA, 6:7, NA)
+# including NA values will produce an NA output
+mean(x)
+```
+
+# excluding NA values will calculate the mathematical operation for all non-missing values
+```{r}
+mean(x, na.rm = TRUE)
+```
+We may also desire to subset our data to obtain complete observations, those observations (rows) in our data that contain no missing data. We can do this a few different ways.
+
+```{r}
+# data frame with missing values
+df <- data.frame(col1 = c(1:3, NA),
+                 col2 = c("this", NA,"is", "text"), 
+                 col3 = c(TRUE, FALSE, TRUE, TRUE), 
+                 col4 = c(2.5, 4.2, 3.2, NA),
+                 stringsAsFactors = FALSE)
+df
+```
+First, to find complete cases we can leverage the complete.cases() function which returns a logical vector identifying rows which are complete cases. So in the following case rows 1 and 3 are complete cases. We can use this information to subset our data frame which will return the rows which complete.cases() found to be TRUE.
+
+```{r}
+complete.cases(df)
+```
+
+```{r}
+# subset with complete.cases to get complete cases
+df[complete.cases(df), ]
+```
+
+```{r}
+# or subset with `!` operator to get incomplete cases
+df[!complete.cases(df), ]
+```
+
+An shorthand alternative is to simply use na.omit() to omit all rows containing missing values.
+
+```{r}
+# or use na.omit() to get same as above
+na.omit(df)
+```
+
+
+## Import data and missing values
+
+
+Download the MA.csv dataset from moodle and import in an object named dat in `R`. See Previus Labs on how to import data. 
+
+```{r}
+dat <- read.csv("MA.csv",header=TRUE)
+```
+
+Have a look at the names of your dataset:
+
+```{r}
+names(dat)
+```
+
+We would like to change those into smaller names that are easier to work with. 
+The names of the set will be changed by:
+
+```{r}
+names(dat) <- c("time","gender","age","hair","phair","horoscope","xfactor","artist","mark","height","socks","night")
+```
+Have a look now at the names of the data: 
+
+```{r}
+names(dat)
+```
+
+Now attach the data set onto using `attach` and run a summary of your data. 
+
+```{r}
+attach(dat)
+summary(dat)
+```
+```{r}
+head(dat)
+```
+
+
+You will see that you have a missing value in some variables, called NA.
+
+To find out where the missing value is try:
+
+```{r}
+dat[!complete.cases(dat),]
+```
+You see that line 5 does not have any data, and line 11 misses only some data.
+
+```{r}
+sum(is.na(dat))
+```
+
+
+Remove line 5 from your data using: 
+
+```{r}
+dat <- dat[-5,]
+detach("dat")
+attach(dat)
+```
+
+## Factor to numeric
+
+Variable height should have been numeric. However, some of the people used text when answering the questionaire. Thus if you type `summary(height)` you get ''weird'' answer.
+you can check the variable type by:
+
+```{r}
+print(height) 
+```
+
+```{r}
+is.numeric(height)
+is.factor(height)
+is.character(height)
+```
+
+So we would like to get rid of the problematic value. 
+Try the following:
+
+```{r}
+heigN <- as.numeric(as.character(height))
+```
+
+```{r}
+heigN
+is.numeric(heigN)
+```
+
+You see that there is a warning that some NAs were produced. The first NA is because the original value of 1,74 and `R` does not recognise , as a value. So replace that NA with 1.74 by:
+
+```{r}
+heigN[10] <- 1.74
+```
+
+Also, the 16th value in height was '1.8m', so we need to change that, as well as the value 170 (in place 11)
+
+```{r}
+height
+heigN[11] <- 1.70
+heigN[16] <- 1.80
+```
+
+```{r}
+heigN
+```
+Now try the summary again. 
+
+```{r}
+summary(heigN)
+```
+
+
+## Questions
+
+Play around with the data. You should be able to answer the following questions without
+counting, just by using `R` code.
+
+ - How many male and female are in the data?
+ - How many of the brown hair people would like a blonde partner?
+ - What is the distribution of horoscopes?
+
+## Solution
+
+

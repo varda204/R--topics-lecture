@@ -1,0 +1,300 @@
+---
+title: "Tutorial 2: Pribability"
+output: html_document
+Author: Faria Hossain and Asim Gul
+---
+
+# 1. Set Operations
+
+union(x, y) and intersect(x, y) performs set union, intersection on two vectors.
+```{r}
+a <- c(0,1,2,3,4,5) ##c() is a generic function which combines its arguments.
+c(4,5,6,7,8,9) -> b
+```
+```{r}
+print(a)
+```
+```{r}
+b
+```
+```{r}
+union(a,b)
+```
+
+```{r}
+intersect(a,b)
+```
+
+The R function setdiff(x, y) indicates which elements of a vector or data frame X are not existent in a vector or data frame Y. 
+```{r}
+a_b<-setdiff(a,b)
+b_a<-setdiff(b,a)
+a_b
+b_a
+```
+
+setequal(x, y)  performs set equality on two vectors.
+```{r}
+setequal(a,b)
+```
+```{r}
+a==b
+```
+
+## Questions
+```{r}
+(x <- c(sort(sample(1:20, 20)), NA))
+(y <- c(sort(sample(3:23, 7)), NA))
+union(x, y)
+intersect(x, y)
+setdiff(x, y)
+setdiff(y, x)
+setequal(x, y)
+```
+
+# 2.Conditional Probability
+
+Suppose that a certain disease (D) has a prevalence of 20/100.
+
+Also suppose that a certain symptom (S) has a prevalence (in the general population = people with that disease D and people without that disease [probably with other disease, but it's not important]) of 30/100. 
+
+How to get the conditional probability P(S|D)=30% ?
+```{r}
+help(sample)
+```
+
+```{r}
+symptom <- sample(c("yes","no"), 100000, prob=c(0.2, 0.8), rep=TRUE)
+disease <- sample(c("yes","no"), 100000, prob=c(0.3, 0.7), rep=TRUE)
+```
+Check the sequence:
+```{r}
+head(symptom)
+head(disease)
+```
+
+```{r}
+dataset <- data.frame(symptom, disease)
+dst_S_D <-with(dataset, table(symptom, disease))
+dst_S_D
+```
+So the Pr(D|S="yes") =
+```{r}
+probD_Sy <- dst_S_D[2, 2]/sum(dst_S_D[2, ])
+probD_Sy
+```
+
+How about Pr(S|D="yes") =?
+
+# 3. Probability
+
+#### Flipping a fair coin
+
+If you want to run your own experiments with a fair coin, all you have to do is find one, start flipping and keep careful track of the result of each flip. For a small number of flips, say 10, this is pretty easy. But as the number of flips increases, it becomes much harder, mainly because flipping a coin over and over again, for hours or even days, is extremely boring and tedious. There has to be a better way!
+
+Fortunately, R has powerful built-in functions for these sorts of activities. Repetitive tasks that would take practically forever if done manually instead take milliseconds. One of these is sample().
+
+Before we can use sample() we need an object of some kind from which samples can be drawn. In this case we are flipping a coin, so this means that we need to create a coin inside of R. This has been done using a vector below and the object has been saved as coin.
+```{r}
+coin <- c('Heads', 'Tails')
+```
+sample() has two mandatory arguments. The first argument, x, is the object from which a sample is to be drawn and the second argument, size, is the size of the sample to be drawn. Let’s try drawing a sample of size 10 from coin. This is equivalent to flipping a real coin 10 time.
+
+Therefore in order to get sample() to draw 10 times from coin, we need to change the value of replace to TRUE.
+
+```{r}
+sample(coin, 10, replace = TRUE)
+```
+Since when we’re flipping a coin we are chiefly interested in how often the coin lands on each side, all we really need to know is the total number of times and/or the proportion of times this happens for each side. We already know a couple of pretty useful functions for doing this. Let’s try them for 100 flips of our coin.
+```{r}
+table(sample(coin, 1000, replace = TRUE))
+```
+
+```{r}
+prop.table(table(sample(coin, 10000, replace = TRUE)))
+```
+
+Perhaps we would rather combine these results into a single table or dataframe of some kind.
+```{r}
+freq <- as.vector(table(sample(coin, 100, replace = TRUE)))
+prop <- prop.table(freq)
+flips_df <- data.frame('Face' = coin,
+                       'Frequency' = freq, 
+                       'Proportion' = prop)
+flips_df
+```
+
+
+
+# 4. Deal with data
+
+# 4.1 Import data
+
+Data.gov.uk provide a list of all households that have applied for assistance from the local authority, under the homelessness provisions of the 1996 Housing Act. Let us use these data. 
+
+### Read from excel
+
+We are going to import some data from an .xls file. From File>Import Dataset>From Excel browse to E:>Data where you can find the file Homeless2010-2015.xlsx. 
+Check in the window in front of you the code that is used to import these data:
+```{r}
+#install.packages('readxl')
+library(readxl)
+Homeless2010_2015 <- read_excel("C://Data//Homeless2010-2015.xlsx")
+View(Homeless2010_2015)
+```
+You could have directly typed the command into the editor to do the same thing. For the time being just copy and paste the command into your editor, so we can talk about it later. 
+
+
+### Read from SPSS
+Lets repeat similar steps to read data from  an SPSS file. The name of the dataset is homelessUpto2009.sav. 
+
+```{r}
+#install.packages('haven')
+library(haven)
+homelessUpto2009 <- read_sav("C://Data//homelessUpto2009.sav")
+```
+### More
+### Read from SAS
+library(Hmisc)
+mydata <- sasxport.get("c:/mydata.xpt")
+
+### Read from Stata
+library(foreign)
+mydata <- read.dta("c:/mydata.dta")
+
+
+Lets explore the data that we just loaded into R. First, find out the names of the variables:
+
+```{r}
+names(Homeless2010_2015)
+```
+
+For the second data:
+```{r}
+names(homelessUpto2009)
+```
+
+It seems that these are two similar datasets that we would like to merge into one new file. However, the first name of the first variable of the second file is not the same as the one in the first file (Publisher Label vs PublisherLabel). We want to change the name `Publisher Label` to `PublisherLabel`.
+
+```{r}
+names(Homeless2010_2015)[1] <- "PublisherLabel"
+```
+
+Check the outcome:
+```{r}
+names(Homeless2010_2015)
+```
+
+
+##  3.2 Merge data
+
+Datasets can be merged either by adding new observations into existing variables, or new variables. Here we need to add some new lines on the same variables. We use the command `rbind`
+```{r}
+datAll <- rbind(homelessUpto2009,Homeless2010_2015)
+```
+
+Check the dimensions of each dataset and the overall dataset. Do they agree?
+
+```{r}
+dim(homelessUpto2009)
+dim(Homeless2010_2015)
+dim(datAll)
+```
+
+To merge data by adding new variables you can use command `cbind` or `merge` depending on the case. 
+See the following examples. 
+```{r}
+#help(data.frame)
+```
+The function data.frame() creates data frames, tightly coupled collections of variables which share many of the properties of matrices and of lists, used as the fundamental data structure by most of R's modeling software.
+
+```{r}
+authors <- data.frame(
+    surname = I(c("Tukey", "Venables", "Tierney", "Ripley", "McNeil")),
+    nationality = c("US", "Australia", "US", "UK", "Australia"),
+    deceased = c("yes", rep("no", 4)))
+```
+
+```{r}
+books <- data.frame(
+    name = I(c("Tukey", "Venables", "Tierney",
+             "Ripley", "Ripley", "McNeil", "R Core")),
+    title = c("Exploratory Data Analysis",
+              "Modern Applied Statistics ...",
+              "LISP-STAT",
+              "Spatial Statistics", "Stochastic Simulation",
+              "Interactive Data Analysis",
+              "An Introduction to R"),
+    other.author = c(NA, "Ripley", NA, NA, NA, NA,
+                     "Venables & Smith"))
+```
+
+```{r}
+m1 <- merge(authors, books, by.x = "surname", by.y = "name")
+m2 <- merge(books, authors, by.x = "name", by.y = "surname")
+```
+
+## 3.3 Save data
+
+To save the data in a simple format use:
+```{r}
+write.table(datAll,"C:\\Data\\datAll.txt",row.names=FALSE)
+```
+
+To read again: 
+```{r}
+datAll <- read.table("C:\\Data\\datAll.txt",header=TRUE)
+```
+ 
+# 3.4 Data analysis
+
+We would like to do a simple descriptive analysis of the overall dataset. We have a total of 
+```{r}
+nrow(datAll)
+```
+observations. Lets present some simple statistics of each one of the variables. 
+First, lets see the distribution of ethnicities:
+```{r}
+table(datAll$Ethnicity)
+```
+To avoid typing the name of the dataset again and again, we are going to attach the data to the workspace. Use the following command:
+```{r}
+attach(datAll)
+```
+
+Now you can just type 
+
+```{r}
+table(Ethnicity)
+``` 
+to get the outcome. 
+
+To get rates we are going to use the command `prop.table`
+
+```{r}
+prop.table(table(Ethnicity))
+```
+
+To get percentages:
+```{r}
+round( 100*prop.table(table(Ethnicity)),2)
+```
+
+Answer the following guestions:
+
+- What percentage of UK nationals have applied? 
+- What are the most important reasons for application?
+- What where the needs?
+- What was the final decision?
+- What was the average age of the applicant?
+
+### Solution
+
+
+```{r}
+round( 100*prop.table(table(Nationality)),2)
+round( 100*prop.table(table(Reason)),2)
+round( 100*prop.table(table(Need)),2)
+round( 100*prop.table(table(Decision)),2)
+summary(Age)
+```

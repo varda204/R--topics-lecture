@@ -1,0 +1,380 @@
+---
+title: "The evolution of linear regression"
+output: html_notebook
+Author：Faria Hossaain and Asim Gul
+---
+
+
+## Navie Bayes Classifier
+
+```{r}
+install.packages("e1071",repos="http://cran.rstudio.com/")
+library(e1071)
+```
+
+```{r}
+classifier <- naiveBayes(iris[,1:4],iris[,5])
+classifier
+```
+
+# Test
+
+```{r}
+table(predict(classifier, iris[,-5]), iris[,5], dnn=list('predicted','actual'))
+```
+
+#Random Forest in R example IRIS data
+
+#Split iris data to Training data and testing data
+
+```{r}
+ind <- sample(2,nrow(iris),replace=TRUE,prob=c(0.7,0.3))
+iris_train <- iris[ind==1,]
+iris_test <- iris[ind==2,]
+```
+
+Loading randomForest package and generating the Random Forest Learning Tree
+If the package has not been installed previously you might need to install it with install.packages("randomForest")
+```{r}
+#install.packages("randomForest")
+library(randomForest)
+## randomForest 4.6-7
+## Type rfNews() to see new features/changes/bug fixes.
+#Generate Random Forest learning treee
+```
+
+```{r}
+iris_rf <- randomForest(Species~.,data=iris_train,ntree=100,proximity=TRUE)
+print(iris_rf)
+```
+
+We can see that usin the current training data RF has no problem identifying the setosa individuals (class.error=0) but there is more uncertainty for assignment to the classes versicolor and virginica (clas.error ~ 0.08).
+
+
+Now we build a random forest for our testing data
+```{r}
+irisPred<-predict(iris_rf,newdata=iris_test)
+table(irisPred, iris_test$Species)
+```
+
+Checking the classification accuracy
+```{r}
+#The number of correct predictions
+print(sum(irisPred==iris_test$Species))
+```
+
+```{r}
+#out of this many datapoints used to test the prediction
+print(length(iris_test$Species)) 
+```
+
+```{r}
+#the accuracy
+print(sum(irisPred==iris_test$Species)/length(iris_test$Species))
+```
+
+#### Linear Regression
+
+
+Let’s fit our first linear regression model. Here is the equation that we attempt to solve:
+
+Petal.Width=B0+B1×Sepal.Length+B2×Sepal.Width+B3×Petal.Length+B4×uesless
+
+```{r}
+model1 <- lm(Petal.Width ~ . - Species, data = iris_train)
+summary(model1)
+```
+```{r}
+plot(model1, which = 1)
+```
+
+
+
+
+
+
+
+
+
+
+## Example Linear Regression for Predictive Modeling in R
+
+The trees data set is included in base R’s datasets package, and it’s going to help us answer this question. Since we’re working with an existing (clean) data set, steps 1 and 2 above are already done, so we can skip right to some preliminary exploratory analysis in step 3. What does this data set look like?
+
+```{r}
+data(trees) ## access the data from R’s datasets package
+head(trees) ## look at the first several rows of the data
+```
+
+
+```{r}
+str(trees) ## look at the structure of the variables
+```
+
+
+```{r}
+plot(table(trees$Girth))
+```
+
+This data set consists of 31 observations of 3 numeric variables describing black cherry trees:
+
+The trunk girth (in)
+height (ft)
+volume (ft3)
+
+These metrics are useful information for foresters and scientists who study the ecology of trees. It’s fairly simple to measure tree heigh and girth using basic forestry tools, but measuring tree volume is a lot harder. If you don’t want to actually cut down and dismantle the tree, you have to resort to some technically challenging and time-consuming activities like climbing the tree and making precise measurements. It would be useful to be able to accurately predict tree volume from height and/or girth.
+
+
+To decide whether we can make a predictive model, the first step is to see if there appears to be a relationship between our predictor and response variables (in this case girth, height, and volume). Let’s do some exploratory data visualization. We’ll use the ggpairs() function from the GGally package to create a plot matrix to see how the variables relate to one another.
+
+
+```{r}
+plot(trees$Girth, trees$Height)
+```
+
+If we want to label the data points by their group, we can use the “text” function in R to plot some text beside every data point. In this case, the cultivar of trees is stored in the column volumn of the variable “trees”, so we type:
+
+```{r}
+plot(trees$Girth, trees$Height)
+text(trees$Girth, trees$Height, trees$Volume, cex=0.7, pos=4, col="red")
+```
+
+## Calculating Summary Statistics for Multivariate Data
+Another thing that you are likely to want to do is to calculate summary statistics such as the mean and standard deviation for each of the variables in your multivariate data set.
+
+sapply
+
+The “sapply()” function can be used to apply some other function to each column in a data frame, eg. sapply(mydataframe,sd) will calculate the standard deviation of each column in a dataframe “mydataframe”.
+
+This is easy to do, using the “mean()” and “sd()” functions in R. For example, say we want to calculate the mean and standard deviations of each of the 13 chemical concentrations in the wine samples. These are stored in columns 2-14 of the variable “wine”. So we type:
+
+```{r}
+sapply(trees[2:3],mean)
+```
+
+This tells us that the mean of variable column 2 and 3.
+
+ 
+## Calculating Correlations for Multivariate Data
+It is often of interest to investigate whether any of the variables in a multivariate data set are significantly correlated.
+
+To calculate the linear (Pearson) correlation coefficient for a pair of variables, you can use the “cor.test()” function in R. For example, to calculate the correlation coefficient for the first two chemicals’ concentrations, V2 and V3, we type:
+
+```{r}
+cor.test(trees$Girth, trees$Height)
+```
+
+This tells us that the correlation coefficient is about 0.519, which is a very weak correlation. Furthermore, the P-value for the statistical test of whether the correlation coefficient is significantly different from zero is 0.002758. This is much greater than 0.2 (which we can use here as a cutoff for statistical significance), so there is very weak evidence that that the correlation is non-zero.
+
+   
+   
+## Modelling
+   
+```{r}
+install.packages('GGally')
+library(GGally)
+ggpairs(data=trees, columns=1:3, title="trees data")
+```
+The ggpairs() function gives us scatter plots for each variable combination, as well as density plots for each variable and the strength of correlations between variables.
+
+If you’ve used ggplot2 before, this notation may look familiar: GGally is an extension of ggplot2 that provides a simple interface for creating some otherwise complicated figures like this one. As we look at the plots, we can start getting a sense of the data and asking questions. The correlation coefficients provide information about how close the variables are to having a relationship; the closer the correlation coefficient is to 1, the stronger the relationship is. The scatter plots let us visualize the relationships between pairs of variables. Scatter plots where points have a clear visual pattern (as opposed to looking like a shapeless cloud) indicate a stronger relationship.
+
+Let’s dive right in and build a linear model relating tree volume to girth. R makes this straightforward with the base function lm().
+
+```{r}
+fit_1 <- lm(Volume ~ Girth, data = trees)
+```
+
+The lm() function fits a line to our data that is as close as possible to all 31 of our observations. More specifically, it fits the line in such a way that the sum of the squared difference between the points and the line is minimized; this method is known as “minimizing least squares.” Even when a linear regression model fits data very well, the fit isn’t perfect. The distances between our observations and their model-predicted value are called residuals.
+
+We can make a histogram to visualize this using ggplot2.
+```{r}
+ggplot(data=trees, aes(fit_1$residuals)) +
+geom_histogram(binwidth = 1, color = "black", fill = "purple4") +
+theme(panel.background = element_rect(fill = "white"),
+axis.line.x=element_line(),
+axis.line.y=element_line()) +
+ggtitle("Histogram for Model Residuals")
+```
+
+
+
+Let’s have a look at our model fitted to our data for width and volume. We can do this by using ggplot() to fit a linear model to a scatter plot of our data:
+```{r}
+ggplot(data = trees, aes(x = Girth, y = Volume)) +
+geom_point() +
+stat_smooth(method = "lm", col = "dodgerblue3") +
+theme(panel.background = element_rect(fill = "white"),
+axis.line.x=element_line(),
+axis.line.y=element_line()) +
+ggtitle("Linear Model Fitted to Data")
+```
+
+Using our simple linear model to make predictions
+Our model is suitable for making predictions! Tree scientists everywhere rejoice. Let’s say we have girth, height and volume data for a tree that was left out of the data set. We can use this tree to test our model.
+
+Girth	Height	Volume
+18.2 in	72 ft	46.2 ft3
+
+
+How well will our model do at predicting that tree’s volume from its girth? We’ll use the predict() function, a generic R function for making predictions from modults of model-fitting functions. predict() takes as arguments our linear regression model and the values of the predictor variable that we want response variable values for.
+```{r}
+predict(fit_1, data.frame(Girth = 18.2))
+```
+Our volume prediction is 55.2 ft3. This is close to our actual value, but it’s possible that adding height, our other predictive variable, to our model may allow us to make better predictions.
+
+## 2.2 Adding more predictors: multiple linear regression
+Maybe we can improve our model’s predictive ability if we use all the information we have available (width and height) to make predictions about tree volume. It’s important that the five-step process from the beginning of the post is really an iterative process – in the real world, you’d get some data, build a model, tweak the model as needed to improve it, then maybe add more data and build a new model, and so on, until you’re happy with the results and/or confident that you can’t do any better. We could build two separate regression models and evaluate them, but there are a few problems with this approach. First, imagine how cumbersome it would be if we had 5, 10, or even 50 predictor variables. Second, two predictive models would give us two separate predictions for volume rather than the single prediction we’re after. Perhaps most importantly, building two separate models doesn’t let us account for relationships among predictors when estimating model coefficients. In our data set, we suspect that tree height and girth are correlated based on our initial data exploration. As we’ll begin to see more clearly further along in this post, ignoring this correlation between predictor variables can lead to misleading conclusions about their relationships with tree volume. A better solution is to build a linear model that includes multiple predictor variables. We can do this by adding a slope coefficient for each additional independent variable of interest to our model.
+
+Tree Volume ≈ Intercept + Slope1(Tree Girth) + Slope2(Tree Height) + Error
+
+This is easy to do with the lm() function: We just need to add the other predictor variable.
+```{r}
+fit_2 <- lm(Volume ~ Girth + Height, data = trees)
+summary(fit_2)
+```
+lm_output2-1 We can see from the model output that both girth and height are significantly related to volume, and that the model fits our data well. Our adjusted R2 value is also a little higher than our adjusted R2 for model fit_1. Since we have two predictor variables in this model, we need a third dimension to visualize it. We can create a nice 3d scatter plot using the package scatterplot3d: First, we make a grid of values for our predictor variables (within the range of our data). The expand.grid() function creates a data frame from all combinations of the factor variables.
+```{r}
+Girth <- seq(9,21, by=0.5) ## make a girth vector
+Height <- seq(60,90, by=0.5) ## make a height vector
+pred_grid <- expand.grid(Girth = Girth, Height = Height)
+```
+
+Next, we make predictions for volume based on the predictor variable grid:
+```{r}
+pred_grid$Volume2 <-predict(fit_2, new = pred_grid)
+```
+
+Now we can make a 3d scatterplot from the predictor grid and the predicted volumes:
+```{r}
+install.packages('scatterplot3d')
+library(scatterplot3d)
+fit_2_sp <- scatterplot3d(pred_grid$Girth, pred_grid$Height, pred_grid$Volume2, angle = 60, color = "dodgerblue", pch = 1, ylab = "Hight (ft)", xlab = "Girth (in)", zlab = "Volume (ft3)" )
+#And finally overlay our actual observations to see how well they fit:
+fit_2_sp$points3d(trees$Girth, trees$Height, trees$Volume, pch=16)
+```
+
+```{r}
+library(scatterplot3d)
+s3d <- scatterplot3d(trees, type = "h", color = "blue",
+    angle=55, pch = 16)
+# Add regression plane
+my.lm <- lm(trees$Volume ~ trees$Girth + trees$Height)
+s3d$plane3d(my.lm)
+# Add supplementary points
+```
+
+
+
+Let’s see how this model does at predicting the volume of our tree. This time, we include the tree’s height since our model uses Height as a predictive variable:
+```{r}
+predict(fit_2, data.frame(Girth = 18.2, Height = 72))
+```
+This time, we get a predicted volume of 52.13 ft3. This prediction is closer to our true tree volume than the one we got using our simple model with only girth as a predictor, but, as we’re about to see, we may be able to improve.
+
+Accounting for interactions
+While we’ve made improvements, the model we just built still doesn’t tell the whole story. It assumes that the effect of tree girth on volume is independent from the effect of tree height on volume. This is clearly not the case, since tree height and girth are related; taller trees tend to be wider, and our exploratory data visualization indicated as much. Put another way, the slope for girth should increase as the slope for height increases. To account for this non-independence of predictor variables in our model, we can specify an interaction term, which is calculated as the product of the predictor variables.
+
+Tree Volume ≈ Intercept + Slope1(Tree Girth) + Slope2(Tree Height) + Slope3(Tree Girth x Tree Height)+ Error
+
+Once again, it’s easy to build this model using lm():
+```{r}
+fit_3 <- lm(Volume ~ Girth * Height, data = trees) 
+#lateral area = Girth * Height
+summary(fit_3)
+```
+Note that the “Girth * Height” term is shorthand for “Girth + Height + Girth * Height” in our model. lm_output3 As we suspected, the interaction of girth and height is significant, suggesting that we should include the interaction term in the model we use to predict tree volume. This decision is also supported by the adjusted R2 value close to 1, the large value of F and the small value of p that suggest our model is a very good fit for the data. Let’s have a look at a scatter plot to visualize the predicted values for tree volume using this model. We can use the same grid of predictor values we generated for the fit_2 visualization:
+```{r}
+Girth <- seq(9,21, by=0.5)
+Height <- seq(60,90, by=0.5)
+pred_grid <- expand.grid(Girth = Girth, Height = Height)
+```
+Similarly to how we visualized the fit_2 model, we will use the fit_3 model with the interaction term to predict values for volume from the grid of predictor variables:
+```{r}
+pred_grid$Volume3 <-predict(fit_3, new = pred_grid)
+```
+
+
+Now we make a scatter plot of the predictor grid and the predicted volumes:
+```{r}
+install.packages("scatterplot3d") # Install
+library("scatterplot3d") # load
+
+## scaterplot3d is very simple to use and it can be easily extended by adding supplementary points or regression planes into an already generated graphic.
+
+fit_3_sp <- scatterplot3d(pred_grid$Girth, pred_grid$Height, pred_grid$Volume3, angle = 60, color = "dodgerblue", pch = 1, ylab = "Hight (ft)", xlab = "Girth (in)", zlab = "Volume (ft3)")
+#Finally, we overlay our observed data:
+fit_3_sp$points3d(trees$Girth, trees$Height, trees$Volume, pch=16)
+```
+
+It’s a little hard to see in this picture, but this time our predictions lie on some curved surface instead of a flat plane. Now for the moment of truth: let’s use this model to predict our tree’s volume.
+```{r}
+predict(fit_3, data.frame(Girth = 18.2, Height = 72))
+```
+
+Our predicted value using this third model is 45.89, the closest yet to our true value of 46.2 ft3.
+
+Some cautionary notes about predictive models
+Keep the range of your data in mind
+When using a model to make predictions, it’s a good idea to avoid trying to extrapolate to far beyond the range of values used to build the model. To illustrate this point, let’s try to estimate the volume of a small sapling (a young tree):
+```{r}
+predict(fit_3, data.frame(Girth = 0.25, Height = 4))
+```
+
+We get a predicted volume of 62.88 ft3, more massive than the tall trees in our data set. Of course this doesn’t make sense. Keep in mind that our ability to make accurate predictions is constrained by the range of the data we use to build our models.
+
+
+
+###Excrise
+
+Plotting the data points
+First, let’s store this dataframe into a variable called baby.
+
+```{r}
+# Load data
+baby = read.table("baby weights.txt", header = T)
+# Show data
+baby
+```
+
+
+We can then plot these 6 data points on a graph using a scatterplot.
+```{r}
+# Plot data
+plot(baby, 
+     main = "Estimated baby weights during pregnancy", 
+     xlab = "Gestation period (weeks)", 
+     ylab = "Weight (kg)")
+```
+
+
+Examine the correlation and Covariance between the two variables by using the cor cov function in R.
+
+```{r}
+# Compute correlation between gestation period and baby weight
+ 
+# Test whether correlation coefficient is zero
+ 
+```
+
+ 
+Fitting a linear regression model in R is extremely easy and straightforward. The function to pay attention to here is lm, which stands for linear model.
+Here, we are going to fit a linear model which regresses the baby weight on the y-axis against gestation period on the x-axis. The order here is important and worth remembering, the response variable always comes before the explanatory variables.
+We will store the linear model in a variable called model so that we can access the output at a later stage.
+```{r}
+# Fit linear model
+ 
+# Examine model
+ 
+```
+
+
+Add linear model to our scatterplot from earlier on by using the abline function.
+```{r}
+plot(baby, 
+     main = "Estimated baby weights during pregnancy", 
+     xlab = "Gestation period (weeks)", 
+     ylab = "Weight (kg)")
+# Add regression line
+ 
+```

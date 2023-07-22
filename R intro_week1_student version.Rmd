@@ -1,0 +1,313 @@
+---
+title: "Introduction to R"
+output: html_notebook
+---
+
+
+# 1. Introduction
+### About this document
+This is an interactive web page. It was created entirely in Rstudio just by typing simple text. I have no idea how to create web pages or how to program in html. The document contains`R`code and results of`R`code. An example is below.  I have asked `R` to create a simple plot that is seen below. Click on `code` to see the `R` code that was used to create it. Click on `hide` to make it dissapear!
+```{r}
+plot(cars)
+```
+
+The webpage source file, an `.Rmd` file is responsible for what you see. On the top of the page, there is a drop down `code` menu. Click on that to make all code appear/dissapear. You can also download the source file from that button. 
+
+
+### What is `R`
+
+
+
+`R`  is a language and environment for statistical computing and graphics. In `R`, you issue commands or combine them to make programs, in order to analyse your data and turn it into exciting-looking, meaningful plots. 
+
+Its origins are in the statistics community but it is spreading into many other scientific areas. `R` is both free, and cross-platform, so you can obtain and install it on your Windows, Linux or MacOS X machine at home at no cost.  
+
+`R` is an example of a type of product which one might call a \emph{scientific data-analysis language}, provides a wide variety of statistical (linear and nonlinear modelling, classical statistical tests, time-series analysis, classification, clustering, .) and graphical techniques, and is highly extensible. 
+
+
+#### The`R`environment
+
+`R` is an integrated suite of software facilities for data manipulation, calculation and graphical display. It includes an effective data handling and storage facility,
+a suite of operators for calculations on arrays, in particular matrices,
+a large, coherent, integrated collection of intermediate tools for data analysis,
+graphical facilities for data analysis and display either on-screen or on hardcopy, and
+a well-developed, simple and effective programming language which includes conditionals, loops, user-defined recursive functions and input and output facilities.
+**The term "environment" is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software**.
+
+
+Many users think of`R`as a statistics system. We prefer to think of it of an environment within which statistical techniques are implemented.`R`can be extended (easily) via packages. There are about eight packages supplied with the`R`distribution and many more are available through the CRAN family of Internet sites covering a very wide range of modern statistics.
+
+### Why bother
+
+It is really a great tool that opens a door to cutting edge statistical and data science methods. The software is enriched daily  with new packagese and rootines by its own users. Of course there is a steep learning curve, but still, `R` offers so much value that it worths the effort of making the transition from traditional software into a programming environment. 
+
+# R studio
+
+<iframe src="https://player.vimeo.com/video/97166163?color=428bca&title=0&byline=0&portrait=0" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+## Projects in R studio
+You can start a new poject in `R` studio from File>New Project>New Directory>Empty Project. Give the directory a name and browse to the path needed. For this course we are going to use the USB stick as our drive. 
+Next, let us start a new R script from the small icon (+) on the top right.  Check your R studio environment to see what information you have available. We are going to use the R script to type some of the commands below. Once you type something in the script, it can be executed either by selecting it with the mouse and then clicking on Run (top right icon). Or you can use keyboard shortcut : ctrl+enter. 
+
+
+# 2. Working with objects
+
+`R` can be used as an advanced calculator. Just type into console something using the standard notation: + - * /.  See the trully amazing stuff below:
+
+```{r}
+2+2
+```
+
+```{r}
+(35345308-35435409)./34244 
+```
+
+When in console, there is an input prompt `>`. You can type anything you want in there. If it makes ``sense'' the system will evaluate the expression. If not, it will give you an error. Make sure that you actually read the error. It seems a bit daunting at the first, but most comments do make sense and will help you understand what is wrong with your input. 
+
+### Objects
+
+`R` works with objects. Whatever you type you can save in an object (=give it a name and save it). 
+So, if you want to store the result of an addition you can: 
+```{r}
+x <- 5+7
+```
+By this nothing happens on your screen, but if you type `x` then:
+```{r}
+x
+``` 
+You can also have this kind of an object:
+```{r}
+x <- "Look mum, I can type"
+x
+```
+Anything in quotes is considered a string, or just text.
+You can type in numbers, characters or logical operators, eg: 
+
+|type       | consists of:   | example       | testing          |
+|-----------|----------------|---------------|------------------|
+|numeric    | numbers        | `x<-1.0`      | `is.numeric(x)`  |
+|character  | text strings   | `x<-"flarp"`  | `is.character(x)`|
+|logical    | TRUE or FALSE  |  `x<-TRUE`    | `is.logical(x)`  |
+
+
+Working with objects is a shift in the way we interact with the software.
+You can have several different things, like numbers, names, lists, datasets, results of analyses saved an object and then combine them all together. 
+
+Variable names can have letters, numbers and the full
+stop in them, but they can NOT have underscores. They are are case-sensitive: foo, Foo and FOO are all different variables. 
+
+R is a dynamically typed language. That means that you don't have to define your variables or say which variable is which type at the start of your program. You can say  `gak <-37.5` at any point in your program and a numeric variable called `gak` will spring into existance and take on the value 37.5 . If you had a variable of a different type called gak at some earlier point in your program, it will vanish when you create the numeric variable with the same name. 
+
+Let us create a vector of numbers:
+
+```{r}
+age <- c(20,21,32,55,67)
+```
+The `c` is a command that "c"ombines elements together.  
+
+`R` is case sensitive, if you capitalise a letter say `Sum(age)` then you will get an error. 
+Lets try this first: 
+```{r}
+Sum(age)
+```
+ALWAYS  read the error label. Here it states that there is no function `Sum` defined. 
+However: 
+```{r}
+sum(age)
+``` 
+
+One more example of an error: 
+
+```{r}
+sum(Age)
+``` 
+Now, the error states that Age is not defined. 
+
+You can also perform calculations with a vector: 
+
+```{r}
+age*365 #age in days
+age-18 # years passed since you first voted...
+```
+
+## More Exercise
+
+
+```{r}
+# EX: computer with ^ operator
+
+```
+
+```{r}
+# EX: you can compute the remainder after division of 31 by 7
+
+```
+
+```{r}
+# EX: and what is the integer part of a fraction as
+
+```
+
+
+```{r}
+# EX5: Testing 5, 'SAM module', and TRUE are numbers, characters or logical by R
+
+```
+
+### Types of objects 
+
+You can have several different types. The most important are vectors (a number is a vector with just one element), matrices, data frames, lists, arrays etc. You can also have functions or results of an analysis as an object. One important thing to learn is what are the attributes of each object. A vector would have lenght, eg the number of elements in the vector.
+
+```{r}
+length(age)
+```
+If you want to retrieve the 3rd element of that vector you can use subscripts:
+
+```{r}
+age
+age(3)
+```
+
+See what happens with the next commands: 
+
+```{r}
+age # lets see the full vector
+age[1:3]
+age[-3]
+```
+
+We can also have a summary of the vector:
+
+```{r}
+summary(age)
+```
+
+Some useful functions to try out are:
+```{r}
+mean(age)
+median(age)
+sd(age)
+min(age)
+max(age)
+quantile(age)
+```
+
+
+Matrices have two dimensions, rows and columns. Let us create one here:
+
+```{r}
+age <- c(age) #added 5 more observations at the end of the vector
+weight <- c(64,52,68,79,80,52,52,64,88,60)
+mat1 <- cbind(age,weight)
+mat1
+```
+You can see the dimensions of the matrix by using command `dim`
+```{r}
+dim(mat1]
+```
+You can choose some elements by subsripting on two dimensions. The first number will give you rows, the second will give you columns: 
+
+```{r}
+mat1[1,2]#first line second column
+mat1[1,]# show just first line
+mat1[,1]# show just first column
+mat1[-(1:8),] # remover first four lines
+```
+
+### Lists
+A list is a collection of different objects. For example, create a list that denotes the gender of 3 students: 
+```{r}
+x <- c(0,1,1)
+```
+and a label that explains that 0 corresponds to male and 1 to female. 
+```{r}
+z <- "0 is Male, 1 is Female"
+```
+(NOTE that lbls stands for labels, but `labels` is a command already used in `R`. Avoid giving objects names that are reserved as commands by `R`). 
+Now, if you want to save `gender` along with an explanation of the coding you can create a list like: 
+```{r}
+mylist <- list(gender=x, lab=z)
+mylist
+```
+
+A list is an object that has other objects inside. You can see the names of the objects by: 
+```{r}
+names(mylist)
+```
+Now, if you want to pick just an object from within another object you have to use the `$` sign: 
+```{r}
+mylist$lab
+```
+Note the error if you type 
+```{r}
+lab
+``` 
+the object is missing because `R` does not know that is hidden in the list. 
+
+### Working with data
+
+
+Say that you want to have the same data into a data frame. 
+`data.frame` will create a what you need. However, with the gender data and labeling there is a problem: 
+```{r}
+data.frame(gender=x, lab=z)
+```
+`R` is repeats the label value in order to have a matrix of equal size. A data frame should consist of vectors of the same size. See this example: 
+```{r}
+x <- c(12,43,45,56)
+y <- c(0,1,1,1)
+z <- c("M","F","M","M")
+dat <- data.frame(age=x, treatment=y,gender=z)
+dat
+```
+You can now subset your data by using `[]`. Remember, that a matrix or a daset have 2 dimensions: rows and columns. 
+Check your data and see what you get by the subsetting below:
+```{r}
+dat[1,]
+dat[,1]
+dat[3,1]# spoiler: 3rd line, 1st column, just one element
+dat[1:2,1]
+dat[,-4]
+```
+`R` has some build in databases that can be used here for illustration purposes. You can check the ones that are available by typing: 
+```{r}
+data()
+```
+Let us recall the dataset `Orange`. You can check what this dataset is about by typing 
+```{r}
+?Orange
+```
+If type `Orange` in `R` you will see the whole data. However, this in not particularly useful since the dataset is quite large and you cannot make sense of it just by looking. Lets see some commands that will help you understand what these data is about. 
+
+Have a look at your data:
+```{r}
+str(Orange)# gives you the basic structure of the data
+summary(Orange) # give you a summary of the data
+head(Orange)# gives a few lines 
+names(Orange)#gives names of variables
+```
+Working with large data sets is not uncommon in data analysis. When you work with (extremely) large data sets and data frames, your first task as a data analyst is to develop a clear understanding of its structure and main elements. Therefore, it is often useful to show only a small part of the entire data set. 
+
+There are several ways to do this in `R`. The function `head()`enables you to show the first observations of a data frame (or any R object you pass to it). Unoriginally, the function `tail()`prints out the last observations in your data set. 
+You can also use the function `dim()` to show the dimensions of your data set.
+
+In this exercise, you'll be working with the `mtcars` dataset, that is available in `R` by default.
+
+#### Exercise
+- Print the first observations of the [`mtcars`] data set.
+- Use the `tail()` function to display the last observations.
+- Finally, display the overall dimensions of the `mtcars` data frame with `dim()`
+
+
+#### Solution
+```{r}
+# Print the first observations of mtcars
+
+# Print the last observations of mtcars
+
+# Print the dimensions of mtcars
+
+```
+
+
+

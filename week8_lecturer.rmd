@@ -1,0 +1,381 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Uniform Distribution in R
+A uniform distribution is a probability distribution in which every value between an interval from a to b is equally likely to be chosen.
+
+## Example 1: Uniform Probability Density Function (dunif Function)
+#d,p,q,r
+
+dunif(x, min, max)
+– calculates the probability density function (pdf) for the uniform distribution where x is the value of a random variable, and min and max are the minimum and maximum numbers for the distribution, respectively. 
+
+```{r}
+x_dunif <- seq(0, 100, by = 1)  
+y_dunif <- dunif(x_dunif, min = 10, max = 50) # U(10,50)
+plot(y_dunif, type = "l")  
+```
+```{r}
+x_uni_ex1 <- seq(-2, 20, by = 0.5)  
+y_uni_ex1 <- dunif(x_uni_ex1, min = 0, max = 10)
+plot(y_uni_ex1, type = "l") 
+```
+
+
+
+Figure shows the output of the previous R syntax. As you can see, our uniform density remains at 0 up to the point 10, (i.e. the minimum value of our uniform distribution). Then it instantly goes up to a probability of 1 and remains at this level until we reach the value 50 (i.e. the maximum of our uniform distribution).
+
+## Example 2: Uniform Cumulative Distribution Function (punif Function)
+
+punif(x, min, max) – calculates the cumulative distribution function (cdf) for the uniform distribution where x is the value of a random variable, and min and max are the minimum and maximum numbers for the distribution, respectively. 
+
+```{r}
+x_punif <- seq(0, 100, by = 1)
+y_punif <- punif(x_punif, min = 0, max = 10)        
+plot(y_punif, type='l', main = "Uniform Cumulative Distribution Function", ylab = "F(x)", xlab = "x")                          
+``` 
+```{r}
+x_uni_ex1 <- seq(-2, 20, by = 0.5)  
+y_uni_ex1 <- punif(x_uni_ex1, min = 0, max = 10)
+plot(y_uni_ex1, type = "o",main = "CDF",ylab = "F(x)", xlab = "F(x)") 
+```
+
+
+## Example 3: Uniform Quantile Function (qunif Function)
+
+qunif gives the quantile function.
+
+We can draw a quantile function as you can see in the R code below. First, we need to create a sequence of probabilities (i.e. values between 0 and 1):
+
+```{r}
+x_qunif <- seq(0, 1, by = 0.01)                      # Specify
+y_qunif <- qunif(x_qunif, min = 10, max = 50)        # Apply 
+plot(y_qunif, type = "o")                            # Plot ```
+```
+ 
+
+##Example 4: Generating Random Numbers (runif Function)
+
+runif generates random deviates.
+We can also simulate a set of uniformly distributed random numbers. To create a reproducible example, we need to specify a seed:
+
+```{r}
+set.seed(3) # Set seed # for reproducibility
+N <- 1000000# Specify sample size
+x_runif <- runif(N, min = 10, max = 50)               
+#y_runif                                
+# Have a look at the previous output of the RStudio console. It is showing our set of uniformly distributed random numbers.
+#We can illustrate the distribution of our random numbers in a histogram by applying the hist R function:
+hist(x_runif,                                 
+     breaks = 50,
+     main = "",
+     xlim = c(0, 100))
+```
+
+## Exponential distribution
+
+The exponential distribution in R Language is the probability distribution of the time between events in a Poisson point process, i.e., a process in which events occur continuously and independently at a constant average rate. It is a particular case of the gamma distribution.
+
+In R, there are 4 built-in functions to generate exponential distribution:
+
+## dexp()
+dexp(x_dexp, rate) 
+
+x: represents x-values for exp function .
+rate: represents the shapex.
+
+```{r}
+# R program to illustrate 
+# exponential distribution 
+# Specify x-values 
+x_dexp <- seq(0, 5, by = 0.1)  
+# Apply dexp() function                
+y1 <- dexp(x_dexp, rate = 0.5)     
+y2 <- dexp(x_dexp, rate = 1)                  
+y3 <- dexp(x_dexp, rate = 1.5)   
+# Plot dexp values  
+plot(x_dexp, y1, type='l',col=1,ylab='Probability density',xlab='x',xlim=range(0,5),ylim=range(0,1.5))
+lines(x_dexp, y2, col=2)
+lines(x_dexp, y3, col=3)
+legend(3, 1, legend=c("rate=0.5", "rate=1","rate=1.5"),col=c(1,2,3), lty=1, cex=0.8)
+```
+```{r}
+# R program to illustrate 
+# exponential distribution 
+# Specify x-values 
+x_dexp <- seq(0, 4, by = 0.01)  
+# Apply dexp() function                
+y1 <- dexp(x_dexp, rate = 1)     
+# Plot dexp values  
+plot(x_dexp, y1, type='l',col=1,ylab='Probability density',xlab='x',xlim=range(0,4),ylim=range(0,1))
+```
+
+
+```{r}
+# R program to illustrate 
+# exponential distribution 
+# Specify x-values 
+x_dexp <- seq(0, 4, by = 0.01)  
+# Apply dexp() function                
+y1 <- dexp(x_dexp, rate = 1/2)     
+# Plot dexp values  
+plot(x_dexp, y1, type='l',col=1,ylab='Probability density',xlab='x',xlim=range(0,4),ylim=range(0,0.5))
+```
+## pexp()
+pexp(x_pexp, rate )
+
+x: represents x-values for exp function .
+rate: represents the shapex.
+
+
+```{r}
+pexp(7, rate = 0.05)  
+```
+
+```{r}
+1-pexp(24, rate = 0.05)  
+```
+
+
+```{r}
+# R program to illustrate 
+# exponential distribution 
+# Specify x-values 
+x_pexp <- seq(1, 10, by = 0.2)                                      
+# Apply pexp() function 
+y_pexp <- pexp(x_pexp, rate = 1)  
+# Plot values                   
+plot(y_pexp)   
+```
+```{r}
+# R program to illustrate 
+# exponential distribution 
+# Specify x-values 
+x_dexp <- seq(0, 5, by = 0.1)  
+# Apply dexp() function                
+y1 <- pexp(x_dexp, rate = 0.5)     
+y2 <- pexp(x_dexp, rate = 1)                  
+y3 <- pexp(x_dexp, rate = 1.5)   
+# Plot dexp values  
+plot(x_dexp, y1, type='l',col=1,ylab='P(X<=x)',xlab='x',xlim=range(0,5),ylim=range(0,1))
+lines(x_dexp, y2, col=2)
+lines(x_dexp, y3, col=3)
+legend(3, 0.4, legend=c("rate=0.5", "rate=1","rate=1.5"),col=c(1,2,3), lty=1, cex=0.8)
+```
+
+
+## qexp()
+qexp(x_qexp, rate)
+
+x: represents x-values for exp function .
+rate: represents the shapex.
+```{r}
+# R program to illustrate 
+# exponential distribution 
+  
+# Specify x-values  
+x_qexp <- seq(0, 1, by = 0.02)                      
+   
+# Apply qexp() function 
+y_qexp <- qexp(x_qexp, rate = 1) 
+   
+# Plot values                    
+plot(y_qexp)    
+```
+
+
+
+## rexp()
+rexp(N, rate)
+
+rate: represents the shapex.
+N: Specify sample size
+
+```{r}
+# R program to illustrate 
+# exponential distribution 
+  
+# Set seed for reproducibility 
+set.seed(500)  ## Generate a set of random Numbers
+# Specify size          
+N <- 10000
+# Draw exp distributed values 
+y_rexp <- rexp(N, rate = 1) 
+   
+# Plot exp density   
+hist(y_rexp, breaks = 50, main = "")
+```
+```{r}
+set.seed(1)
+par(mfrow=c(2,3))
+set.seed(1)
+hist(rexp(10))
+hist(rexp(100))
+hist(rexp(1000))
+hist(rexp(10000))
+```
+
+## Normal Distribution in R
+
+R has four in built functions to generate normal distribution. They are described below.
+
+dnorm(x, mean = 0, sd = 1, log = FALSE)
+pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+rnorm(n, mean = 0, sd = 1)
+
+Following is the description of the parameters used in above functions −
+
+x is a vector of numbers.
+
+p is a vector of probabilities.
+
+n is number of observations(sample size).
+
+mean is the mean value of the sample data. It's default value is zero.
+
+sd is the standard deviation. It's default value is 1.
+
+###1. dnorm()
+Syntax: dnorm(x, mean, sd)
+
+This function gives height of the probability distribution at each point for a given mean and standard deviation.
+For example:
+
+```{r}
+# point probability for a specific value of a standard normal dist
+dnorm(-1.96) ##pdf
+```
+
+```{r}
+# plotting the density function of a normal distribution: N(2, .25)
+x <- seq(0, 4, 0.1)
+
+plot(x, dnorm(x, 2, 0.5), type = "l")
+```
+
+```{r}
+# plotting the density function of a binomial distribution: Binom(30, .25)
+y <- 0:30
+plot(y, dbinom(y, 30, 0.25), type = "h")
+```
+
+```{r}
+# R program to illustrate 
+# exponential distribution 
+# Specify x-values 
+x_dexp <- seq(-1, 16, by = 0.1)  
+# Apply dexp() function                
+y1 <- dnorm(x_dexp, 5,4)     
+y2 <- dnorm(x_dexp, 10,4)   
+# Plot dexp values  
+plot(x_dexp, y1, type='l',col=1,ylab='Probability density',xlab='x',xlim=range(-1,16),ylim=range(0,0.1))
+lines(x_dexp, y2, col=2)
+legend(7, 0.02, legend=c("N(5,4)","N(10,4)"),col=c(1,2), lty=1, cex=0.8)
+```
+
+
+```{r}
+# R program to illustrate 
+# exponential distribution 
+# Specify x-values 
+x_dexp <- seq(-5, 16, by = 0.1)  
+# Apply dexp() function                
+y1 <- dnorm(x_dexp, 5,4)     
+y2 <- dnorm(x_dexp, 5,1)   
+# Plot dexp values  
+plot(x_dexp, y1, type='l',col=1,ylab='Probability density',xlab='x',xlim=range(-5,16),ylim=range(0,0.4))
+lines(x_dexp, y2, col=2)
+legend(12, 0.3, legend=c("N(5,4)","N(5,1)"),col=c(1,2), lty=1, cex=0.8)
+```
+
+
+
+```{r}
+x <- seq(-20, 20, by = .1)
+y <- dnorm(x, mean = 5.0, sd = 1.0)
+plot(x,y, main = "Normal Distribution", col = "blue")
+```
+
+
+
+
+##2. pnorm()
+Syntax: pnorm(x,mean,sd) 
+This function gives the probability of a normally distributed random number to be less that the value of a given number. It is also called "Cumulative Distribution Function".
+For example:
+
+```{r}
+# calculating the p-values for the quantiles of a standard normal
+1 - pnorm(1.959964)
+```
+
+ 
+```{r}
+1 - pnorm(1.644854)
+```
+
+```{r}
+x <- seq(-20, 20, by = .1)
+y <- pnorm(x, mean = 5.0, sd = 1.0)
+plot(x,y, main = "pnorm()", col = "blue")
+```
+Pr[Height < 157.5]
+```{r}
+pnorm(157.5, mean = 177.6, sd = 9.7)
+```
+
+
+##3 qnorm()
+Syntax: qnorm(x,mean,sd)
+
+This function takes the probability value and gives a number whose cumulative value matches the probability value.
+
+For example:
+
+```{r}
+x <- seq(0, 1, by = 0.02)
+y <- qnorm(x, mean = 2, sd = 1) #DataFlair
+plot(x,y, main = "qnorm()", col = "blue")
+```
+
+
+##4 rnorm()
+Syntax: rnorm(n, mean, sd)
+
+This function is used to generate random numbers whose distribution is normal. It takes the sample size as input and generates that many random numbers. We draw a histogram to show the distribution of the generated numbers.
+
+For example:
+
+Create a sample of 50 numbers which are normally distributed.
+
+```{r}
+y <- rnorm(5000)
+hist(y, main = "Normal Distribution", col = "darkorange")
+```
+
+
+```{r}
+set.seed(124)
+# It is often very useful to be able to generate a sample from a specific distribution. To generate a sample of size 100 from a standard normal distribution (with mean 0 and standard deviation 1) we use the rnorm function. We only have to supply the n (sample size) argument since mean 0 and standard deviation 1 are the default values for the mean and stdev arguments.
+```
+
+
+```{r}
+norm <- rnorm(1000)
+#Now let’s look at the first 10 observations.  We use square brackets to surround the first and last element number.  In the output, the number of the first element listed on the line is given in the square brackets. For example, the [9] indicates that the first number given (0.19709386) is the ninth element.
+```
+
+```{r}
+norm[1:100]
+```
+
+```{r}
+mean(norm)
+```
+
+```{r}
+sd(norm)
+```

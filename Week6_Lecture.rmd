@@ -1,0 +1,270 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+### Covariance in R
+```{r}
+t=seq(0,10,0.5)
+y1=sin(t)
+y2=cos(t-0.6*pi)
+y3=cos(t+0.5*pi)
+plot(t,y1,type="o", lty=2, xlab="time", ylab="Sine/Cos wave",col='blue')
+points(t, y2, type="o", lty=1, col = 'red')
+```
+```{r}
+cov(y1, y2)  
+cor(y1, y2) 
+```
+```{r}
+plot(t,y1,type="o", lty=2, xlab="time", ylab="Sine/Cos wave",col='blue')
+points(t, y3, type="o", lty=1, col = 'red')
+```
+```{r}
+cov(y1, y3)  
+cor(y1, y3) 
+```
+## covariance and correlation between X,Y
+```{r}
+X <- rnorm(100,mean=10,sd=2)
+plot(density(X))
+```
+creates a r.v. from a normal distribution, 100 observations, with mean =10 and s.d.=2
+```{r}
+Y <- 2*X+rnorm(100,mean=4,sd=1)
+plot(density(Y))
+```
+creates a second r.v. which is twice the first one plus some noise
+```{r}
+plot(X,Y)
+```
+
+```{r}
+v_X=var(X)
+v_Y=var(Y)
+v_XY=var(X+Y)
+print(v_X)
+print(v_Y)
+print(v_XY)
+```
+
+
+```{r}
+cov_XY=0.5*(v_XY-v_X-v_Y)
+print(cov_XY)
+```
+
+
+```{r}
+cov(X,Y)
+#gives covariance between X,Y
+cor(X,Y)
+#gives correlation between X,Y
+```
+
+### Negative covariance in R
+```{r}
+X <- rnorm(100,mean=10,sd=2)
+plot(density(X))
+# creates a r.v. from a normal distribution, 100 observations, with mean =10 and s.d.=2
+```
+
+```{r}
+Y <- -2*X+rnorm(100,mean=4,sd=1)
+plot(density(Y))
+# creates a second r.v. which is twice the first one plus some noise
+```
+```{r}
+plot(X,Y)
+```
+
+```{r}
+cov(X,Y)
+#gives covariance between X,Y
+cor(X,Y)
+#gives correlation between X,Y
+```
+## Independent X and Y
+```{r}
+X <- rnorm(100,mean=10,sd=2)
+plot(density(X))
+# creates a r.v. from a normal distribition, 100 observations, with mean =10 and s.d.=2
+Y <- rnorm(100,mean=4,sd=1)
+plot(density(Y))
+# creates a second r.v.
+plot(X,Y)
+```
+
+```{r}
+cov(X,Y)
+#gives covariance between X,Y
+cor(X,Y)
+#gives covariance between X,Y
+```
+
+### Combinations and Permutations
+
+```{r}
+install.packages("combinat")                   # Install combinat package
+library("combinat")                            # Load combinat package
+```
+
+combn(x, m, fun=NULL, simplify=TRUE, …)
+
+Parameters : 
+
+x – vector source for combinations
+m – number of elements to be taken
+fun – function to be applied to each combination (may be null)
+simplify – logical, if FALSE, returns a list, otherwise returns vector or array
+
+```{r}
+permut <- permn(3)                             # Create list of permutations
+permut                                         # Print list of permutations
+```
+```{r}
+permut_count <- length(permn(3))               # Count permutations
+permut_count                                   # Print count of permutations
+```
+```{r}
+combi <- combn(3, 2)                 # Create matrix of combinations
+combi                                          # Print matrix of combinations
+```
+
+```{r}
+combi_count <- ncol(combn(3, 2))     # Count combinations
+combi_count                          # Print count of combinations
+```
+
+### The binomial distribution in R
+R has several built-in functions for the binomial distribution. They’re listed in a table below along with brief descriptions of what each one does.
+
+X~B(n,p)
+
+##1. rbinom(n, size, prob)	
+
+Generates numbers which follow a binomial distribution with the given parameters
+
+Let’s try these functions out to see how they really work.
+
+We’ll start with rbinom(), a function which randomly generates numbers which follow a binomial distribution with given parameters. For our first test of it, we’ll generate one observation (n = 1) of a sample of size 100 (size = 100) and a probability of success of 0.3 (prob = 0.3).
+
+```{r}
+set.seed(10)
+rbinom(3, 100, 0.3)
+```
+
+```{r}
+y2 <- rbinom(8, size = 100, prob = 1 / 6) 
+print(y2)
+```
+
+##2. dbinom(x, size, prob)
+
+P(X = x), the probability that X = x
+
+
+Since only one out of five possible answers is correct, the probability of answering a question correctly by random is 1/5=0.2. We can find the probability of having exactly 4 correct answers by random attempts as follows.
+```{r}
+dbinom(4, size=12, prob=0.2)
+```
+
+```{r}
+dbinom(4, size=8, prob=0.5)
+```
+
+```{r}
+# Create a sample of 50 numbers which are incremented by 1.
+x <- seq(0,50,by = 1)
+# Create the binomial distribution.
+#y <- dbinom(x,size=50,prob=0.5)
+y <- dbinom(x,50,0.5)
+# Plot the graph for this sample.
+plot(x,y)
+```
+
+```{r}
+dbinom(3, size = 13, prob = 1 / 6) 
+probabilities <- dbinom(x = c(0:10), size = 13, prob = 1 / 6) 
+data.frame(probabilities)
+#plot(0:10, probabilities, type = "l") 
+plot(0:0.1:10, probabilities, type = "l") 
+```
+
+##3. pbinom(q, size, prob, lower.tail = TRUE)
+
+P(X =< q), the probability that X takes a value less than or equal to q
+
+
+Alternatively, we can use the cumulative probability function for binomial distribution pbinom.
+
+```{r}
+pbinom(4, size=8, prob=0.5) 
+```
+```{r}
+x <- pbinom(26,51,0.5)
+print(x)
+```
+```{r}
+pbinom(3, size = 13, prob = 1 / 6) 
+plot(0:10, pbinom(0:10, size = 10, prob = 1 / 6), type = "l")
+```
+ 
+###The geometric Distribution in R
+A sports marketer randomly selects persons on the street until he encounters someone who attended a game last season. What is the probability the market encounters x = 10 people who did not attend a game before the first success when p = 0.20 of the population attended a game?
+```{r}
+p = 0.20
+n = 10
+# exact
+dgeom(x = n, prob = p)
+```
+```{r}
+rgeom(n = 100, prob = p)
+```
+
+
+
+```{r}
+# simulated
+mean(rgeom(n = 100, prob = p) == 10)
+```
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+Example
+From the prior example, what is the probability the marketer fails to find someone who attended a game in x <= 5 trials before finding someone who attended a game on the next trial when the population probability is p = 0.20?
+```{r}
+p = 0.20
+n = 5
+# exact
+pgeom(q = n, prob = p, lower.tail = TRUE)
+```
+```{r}
+# simulated
+mean(rgeom(n = 10000, prob = p) <= n)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+data.frame(x = 0:10, 
+           pmf = dgeom(x = 0:10, prob = p),
+           cdf = pgeom(q = 0:10, prob = p, lower.tail = TRUE)) %>%
+  mutate(Failures = ifelse(x <= n, n, "other")) %>%
+ggplot(aes(x = factor(x), y = cdf, fill = Failures)) +
+  geom_col() +
+  geom_text(
+    aes(label = round(cdf,2), y = cdf + 0.01),
+    position = position_dodge(0.9),
+    size = 3,
+    vjust = 0
+  ) +
+  labs(title = "Cumulative Probability of X = 5 Failures.",
+       subtitle = "Geometric(.3)",
+       x = "Failures prior to first success (x)",
+       y = "probability") 
+```
+

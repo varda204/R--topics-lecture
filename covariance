@@ -1,0 +1,65 @@
+
+#
+data <- data.frame(x = c(9, 15, 25, 14, 10, 18, 0, 16, 5, 19, 16, 20),y = c(39, 56, 93, 61, 50, 75, 32, 85, 42, 70, 66, 80))
+x_mean <- mean(data$x)
+y_mean <- mean(data$y)
+covariance <- sum((data$x - x_mean) * (data$y - y_mean)) / (nrow(data) - 1)
+covariance_matrix <- var(data) * (nrow(data) - 1) / nrow(data)
+cat("Covariance: ", covariance, "\n")
+cat("Covariance Matrix: \n")
+print(covariance_matrix)
+
+
+#
+
+data <- data.frame(x = c(9, 15, 25, 14, 10, 18, 0, 16, 5, 19, 16, 20), y = c(39, 56, 93, 61, 50, 75, 32, 85, 42, 70, 66, 80))
+x_mean <- mean(data$x)
+y_mean <- mean(data$y)
+n <- nrow(data)
+covariance <- sum((data$x - x_mean) * (data$y - y_mean)) / (n - 1)
+var_x <- sum((data$x - x_mean)^2) / (n - 1)
+var_y <- sum((data$y - y_mean)^2) / (n - 1)
+cat("VAR(x): ", var_x, "\n")
+cat("VAR(y): ", var_y, "\n")
+cat("Covariance: ", covariance, "\n")
+cat("Covariance Matrix: \n")
+print(covariance_matrix)
+covariance_matrix <- cov(data) * (n - 1) / n
+cat("Covariance Matrix: \n")
+print(covariance_matrix)
+
+
+
+
+#
+data <- data.frame(x = c(9, 15, 25, 14, 10, 18, 0, 16, 5, 19, 16, 20), y = c(39, 56, 93, 61, 50, 75, 32, 85, 42, 70, 66, 80))
+x_mean <- mean(data$x)
+y_mean <- mean(data$y)
+n <- nrow(data)
+covariance <- sum((data$x - x_mean) * (data$y - y_mean)) / (n - 1)
+var_x <- sum((data$x - x_mean)^2) / (n - 1)
+var_y <- sum((data$y - y_mean)^2) / (n - 1)
+cat("VAR(x): ", var_x, "\n")
+cat("VAR(y): ", var_y, "\n")
+cat("Covariance: ", covariance, "\n")
+covariance_matrix <- cov(data) * (n - 1) / n
+cat("Covariance Matrix: \n")
+print(covariance_matrix)
+covariance_matrix <- cov(data)*(n-1)/n
+print(covariance_matrix)
+
+
+
+
+
+#
+data <- data.frame(x = c(9, 15, 25, 14, 10, 18, 0, 16, 5, 19, 16, 20), y = c(39, 56, 93, 61, 50, 75, 32, 85, 42, 70, 66, 80))
+x_mean <- mean(data$x)
+y_mean <- mean(data$y)
+n <- nrow(data)
+covariance <- sum((data$x - x_mean) * (data$y - y_mean)) / (n - 1)
+var_x <- sum((data$x - x_mean)^2) / (n - 1)
+var_y <- sum((data$y - y_mean)^2) / (n - 1)
+covariance_matrix <- matrix(c(var_x, covariance, covariance, var_y), ncol = 2, byrow = TRUE)
+cat("Covariance Matrix: \n")
+print(covariance_matrix)

@@ -1,0 +1,252 @@
+---
+title: "R Notebook"
+output: html_notebook
+Author: Faria Hossain and Asim Gul
+---
+
+```{r}
+data(iris)
+```
+ 
+```{r}
+iris <- iris
+```
+
+```{r}
+head(iris)
+View(iris)
+```
+
+```{r}
+names(iris) 
+```
+
+```{r}
+# dimensions of dataset
+dim(iris)
+```
+
+```{r}
+# list types for each attribute
+sapply(iris,class)
+```
+
+```{r}
+# take a peek at the first 5 rows of the data
+head(iris)
+# list the levels for the class
+levels(iris$Species)
+```
+
+```{r}
+# summarize the class distribution
+percentage <- prop.table(table(iris$Species)) * 100
+```
+
+
+```{r}
+cbind(freq=table(iris$Specie), percentage=percentage)
+```
+
+```{r}
+# summarize attribute distributions
+summary(iris)
+```
+
+```{r}                  
+x <- iris[,1:4]
+y <- iris[,5]
+#Given that the input variables are numeric, we can create box and whisker plots of each.
+```
+
+```{r}
+# boxplot for each attribute on one image
+par(mfrow=c(1,4))
+   for(i in 1:4) {
+   boxplot(x[,i], main=names(iris)[i])
+   }
+
+```
+
+```{r}
+plot(Sepal.Length ~ Petal.Length,
+        xlab = "Petal Length (cm)",
+        ylab = "Sepal Length (cm)",
+        pch = c(16, 17, 18)[as.numeric(Species)],  # different 'pch' types 
+        main = "Iris Dataset",
+        col = c("red", "green","blue")[as.numeric(Species)],
+        data = iris)
+ # Put `iris.testLabels` in a data frame
+```
+
+
+
+ 
+```{r}
+set.seed(1234)
+ind <- sample(1:2, nrow(iris), replace=TRUE, prob=c(0.95, 0.05))
+ind
+#set.seed() function in R is used to reproduce results i.e.  it produces the same sample again and again. When we generate randoms numbers without set.seed() function it will produce different samples at different time of execution.
+```
+ 
+```{r}
+length(ind)
+```
+ 
+```{r}
+# Compose training set
+iris.training <- iris[ind==1, 1:4]
+# Inspect training set
+dim(iris.training)
+```
+
+ 
+```{r}
+# Compose test set
+iris.test <- iris[ind==2, 1:4]
+# Inspect test set
+dim(iris.test)
+```
+
+```{r}
+# Compose `iris` training labels
+iris.trainLabels <- iris[ind==1,5]
+# Inspect result
+print(iris.trainLabels)
+```
+
+```{r}
+# Compose `iris` test labels
+iris.testLabels <- iris[ind==2, 5]
+# Inspect result
+print(iris.testLabels)
+```
+
+```{r}
+irisTestLabels <- data.frame(iris.testLabels)
+```
+
+
+
+## Model KNN
+```{r}
+#install.packages('class')
+library(class)
+# Build?the model
+iris_pred <- knn(train = iris.training, test = iris.test, cl = iris.trainLabels, k=3)
+# Inspect `iris_pred`
+print(iris_pred)
+```
+
+```{r}
+# Put `iris.testLabels` in a data frame
+irisTestLabels <- data.frame(iris.testLabels)
+# Merge `iris_pred` and `iris.testLabels` 
+merge_acc_test <- data.frame(iris_pred,iris.testLabels)
+
+names(merge_acc_test) <- c("Predicted Species", "Observed Species")
+merge_acc_test
+table(merge_acc_test[1]==merge_acc_test[2])
+```
+
+```{r}
+100 * table(merge_acc_test[1]==merge_acc_test[2])["TRUE"]/length(iris.testLabels)
+```
+
+## Model KMEAN
+
+```{r}
+install.packages("tidyverse")
+```
+
+```{r}
+library(ggplot2)
+ggplot(iris, aes(Petal.Length, Petal.Width)) + geom_point(aes(col=Species), size=3)
+set.seed(101)
+irisCluster <- kmeans(iris[,1:4], center=3, nstart=20)
+irisCluster
+```
+
+
+
+```{r}
+library(cluster)
+ clusplot(iris, irisCluster$cluster, color=T, shade=T, labels=0, lines=0)
+tot.withinss <- vector(mode="character", length=10)
+```
+
+
+```{r}
+iris.new<- iris[,c(1,2,3,4)]
+iris.class<- iris[,"Species"]
+head(iris.new)
+```
+
+```{r}
+result<- kmeans(iris.new,3) #aplly k-means algorithm with no. of centroids(k)=3
+result$size # gives no. of records in each cluster
+```
+
+```{r}
+result$centers # gives value of cluster center datapoint value(3 centers for k=3)
+```
+
+```{r}
+result$cluster #gives clus?er vector showing the custer where each record falls
+```
+
+Verify results of clustering
+```{r}
+par(mfrow=c(2,2), mar=c(5,4,2,2))
+plot(iris.new[c(1,2)], col=result$cluster)# Plot to see how Sepal.Length and Sepal.Width data points have been distributed in cl?sters
+plot(iris.new[c(1,2)], col=iris.class)# Plot to see how Sepal.Length and Sepal.Width data points have been distributed originally as per "class" attribute in dataset
+plot(iris.new[c(3,4)], col=result$cluster)# Plot to see how Petal.Length and Petal.W?dth data points have been distributed in clusters
+plot(iris.new[c(3,4)], col=iris.class)
+```
+
+
+```{r}
+ta<-table(irisCluster$cluster, iris$Species)
+ta
+```
+
+
+Result of table shows that Cluster 1 corresponds to Virginica, Cluster 2 corresponds to Versicolor and Cluster 3 to?Setosa.
+
+Total number of correctly classified instances are: 36 + 48 + 50= 134
+Total number of incorrectly classified instances are: 2 + 14= 16
+Accuracy = 134/(134+16) = 0.88 i.e our model has achieved 88% accuracy!
+In order to improve this accuracy furthe?, we may try different values of ??k??. In some cases, it is also beneficial to change the algorithm in case k-means is unable to yield good results.
+
+## Model SVM
+```{r}
+install.packages("e1071")
+library("e1071")
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+ 
+```{r}
+
+```
+
+
+```{r}
+
+
+```
+
+```{r}
+
+```
